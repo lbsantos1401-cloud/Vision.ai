@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <title>VISION.AI v2.0 | Agente de Contexto</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;900&family=JetBrains+Mono&family=Comfortaa:wght@300&display=swap');
+    
+    :root { --neon: #0ea5e9; --primary-bg: #050505; }
+    body { 
+      font-family: 'Inter', sans-serif; background: var(--primary-bg); color: #fff;
+      overflow-x: hidden; min-height: 100vh;
+    }
+    .mono { font-family: 'JetBrains Mono', monospace; }
+    
+    /* Header Animado */
+    .hero-title {
+      font-weight: 900; font-size: clamp(3rem, 10vw, 8rem); letter-spacing: -0.05em;
+      background: linear-gradient(90deg, #fff, #444); -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    }
+
+    .step-container { transition: all 0.5s ease; }
+    .hidden { display: none !important; }
+
+    /* Estilo dos Cards de Opção */
+    .option-card {
+      background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.1);
+      padding: 1rem; border-radius: 4px; cursor: pointer; transition: 0.3s;
+      text-transform: uppercase; font-size: 10px; letter-spacing: 0.1em;
+    }
+    .option-card:hover, .option-card.active {
+      border-color: var(--neon); background: rgba(14, 165, 233, 0.1);
+    }
+
+    .loading-overlay {
+      position: fixed; inset: 0; background: rgba(0,0,0,0.9); z-index: 100;
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+    }
+  </style>
+</head>
+<body class="p-6 md:p-12">
+
+  <div id="loading" class="loading-overlay hidden">
+    <div class="w-48 h-[1px] bg-white/10 overflow-hidden relative">
+      <div class="absolute inset-0 bg-blue-500 animate-[progress_2s_infinite_linear]" style="width: 40%"></div>
+    </div>
+    <p id="loading-text" class="mt-4 mono text-[10px] text-blue-400 uppercase tracking-widest">Sincronizando...</p>
+  </div>
+
+  <section id="welcome" class="max-w-6xl mx-auto text-center py-20">
+    <h1 class="hero-title">VISION.AI</h1>
+    <p class="text-white/40 uppercase tracking-[0.5em] text-xs mb-12">Materialização de Contexto v2.0</p>
+    
+    <div class="flex flex-col md:flex-row justify-center gap-4 max-w-md mx-auto">
+      <button onclick="UI.showStep('step-1')" class="bg-white text-black font-bold py-4 px-8 rounded-sm text-xs tracking-widest hover:bg-blue-500 hover:text-white transition-all">NOVA CRIAÇÃO</button>
+      
+      <label class="border border-white/10 py-4 px-8 rounded-sm text-xs tracking-widest cursor-pointer hover:border-white/40">
+        UPLOAD & EDITAR
+        <input type="file" id="img-upload" class="hidden" accept="image/*" onchange="App.handleUpload(event)">
+      </label>
+    </div>
+  </section>
+
+  <main id="main-app" class="max-w-4xl mx-auto hidden bg-white/[0.02] border border-white/5 p-8 rounded-sm">
+    
+    <div id="step-1" class="step-container space-y-6">
+      <h2 class="text-xs font-bold text-blue-400 uppercase tracking-[0.3em]">01. Conceito Base</h2>
+      <textarea id="base-prompt" rows="4" class="w-full bg-white/5 border border-white/10 p-6 text-lg outline-none focus:border-blue-500 transition-all" placeholder="Descreva sua ideia ou o que deseja mudar na imagem..."></textarea>
+      <button onclick="App.analyzeContext()" class="w-full bg-blue-600 py-4 font-bold text-xs tracking-widest uppercase">Mapear Elementos</button>
+    </div>
+
+    <div id="step-2" class="step-container hidden space-y-10">
+      <h2 class="text-xs font-bold text-blue-400 uppercase tracking-[0.3em]">02. Refinamento de Parâmetros</h2>
+      
+      <div id="dynamic-options" class="grid grid-cols-1 md:grid-cols-2 gap-8">
+        </div>
+
+      <button onclick="App.generateFinal()" class="w-full bg-white text-black py-4 font-bold text-xs tracking-widest uppercase hover:bg-blue-400">Gerar Imagem Final</button>
+    </div>
+
+    <div id="step-3" class="step-container hidden space-y-6">
+      <div id="result-display" class="aspect-square bg-white/5 border border-white/10 flex items-center justify-center overflow-hidden">
+        </div>
+      <div class="flex gap-2">
+        <button onclick="location.reload()" class="flex-1 border border-white/10 py-4 text-[10px] tracking-widest uppercase">Novo Projeto</button>
+        <button onclick="UI.showStep('step-1')" class="flex-1 bg-blue-600 py-4 text-[10px] tracking-widest uppercase font-bold">Refinar Esta Foto</button>
+      </div>
+    </div>
+
+  </main>
+
+  <script>
+    /* CONFIGURAÇÃO */
+    const CONFIG = {
+      apiKey: "SUA_API_KEY_AQUI", // Insira sua chave do Google AI Studio
+      model: "gemini-1.5-flash"
+    };
+
+    /* ESTADO DO AGENTE */
+    const State = {
+      mode: 'create', // create ou edit
+      originalImage: null,
+      contextData: {},
+      selections: {}
+    };
+
+    /* MOTOR DE LÓGICA */
+    const App = {
+      // Faz o upload e pede ao Gemini para analisar a imagem
+      async handleUpload(event) {
+        const file = event.target.files[0];
+        if(!file) return;
+        State.mode = 'edit';
+        State.originalImage = file;
+        
+        UI.loading(true, "Lendo imagem via visão computacional...");
+        // Simulação de análise multimodal (Aqui você chamaria a API)
+        setTimeout(() => {
+          this.mockAnalysis(); // Para teste inicial
+          UI.loading(false);
+          UI.showStep('step-2');
+        }, 2000);
+      },
+
+      async analyzeContext() {
+        const text = document.getElementById('base-prompt').value;
+        if(!text) return;
+        
+        UI.loading(true, "Vision está orquestrando o prompt...");
+        // Aqui o Gemini processa o texto e sugere as opções do Step 2
+        this.renderOptions([
+          { label: "Iluminação", options: ["Cinematográfica", "Neon", "Luz Natural", "Estúdio"] },
+          { label: "Ângulo", options: ["Frontal", "Derrubada", "Macro", "Grande Angular"] },
+          { label: "Clima", options: ["Cyberpunk", "Minimalista", "Vintage", "Realista"] }
+        ]);
+        
+        setTimeout(() => {
+          UI.loading(false);
+          UI.showStep('step-2');
+        }, 1200);
+      },
+
+      renderOptions(groups) {
+        const container = document.getElementById('dynamic-options');
+        container.innerHTML = '';
+        groups.forEach(group => {
+          const div = document.createElement('div');
+          div.innerHTML = `<label class="text-[9px] text-white/30 uppercase tracking-widest mb-3 block">${group.label}</label>
+                           <div class="grid grid-cols-2 gap-2"></div>`;
+          const grid = div.querySelector('div');
+          group.options.forEach(opt => {
+            const btn = document.createElement('div');
+            btn.className = 'option-card';
+            btn.innerText = opt;
+            btn.onclick = () => {
+              grid.querySelectorAll('.option-card').forEach(c => c.classList.remove('active'));
+              btn.classList.add('active');
+              State.selections[group.label] = opt;
+            };
+            grid.appendChild(btn);
+          });
+          container.appendChild(div);
+        });
+      },
+
+      async generateFinal() {
+        UI.loading(true, "Materializando alta fidelidade...");
+        // O Gemini aqui uniria State.selections + base-prompt em um prompt único
+        setTimeout(() => {
+          UI.loading(false);
+          UI.showStep('step-3');
+          document.getElementById('result-display').innerHTML = `<p class="mono text-[10px] text-white/20 uppercase">Imagem gerada com base no contexto.</p>`;
+        }, 3000);
+      },
+
+      mockAnalysis() {
+        this.renderOptions([
+          { label: "Alteração", options: ["Mudar Cores", "Adicionar Objeto", "Remover Fundo", "Alterar Estilo"] },
+          { label: "Fidelidade", options: ["Preservar Original", "Liberdade Criativa"] }
+        ]);
+      }
+    };
+
+    /* INTERFACE CONTROLLER */
+    const UI = {
+      showStep(id) {
+        document.getElementById('welcome').classList.add('hidden');
+        document.getElementById('main-app').classList.remove('hidden');
+        document.querySelectorAll('.step-container').forEach(s => s.classList.add('hidden'));
+        document.getElementById(id).classList.remove('hidden');
+      },
+      loading(show, text = "") {
+        const el = document.getElementById('loading');
+        document.getElementById('loading-text').innerText = text;
+        show ? el.classList.remove('hidden') : el.classList.add('hidden');
+      }
+    };
+  </script>
+
+  <style>
+    @keyframes progress { 0% { left: -100%; } 100% { left: 100%; } }
+  </style>
+</body>
+</html>
