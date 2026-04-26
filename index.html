@@ -126,4 +126,23 @@
     doc.text("- Projeto fotovoltaico", 20, 123);
     doc.text("- Instalação completa", 20, 129);
     doc.text("- Homologação", 20, 135);
-    doc.text("- Monitor
+    doc.text("- Monitoramento 1 ano", 20, 141);
+
+    // ===== FINANCEIRO =====
+    doc.setFontSize(14);
+    doc.text("FINANCEIRO", 20, 160);
+
+    doc.setFontSize(11);
+    doc.text(`Valor do projeto: R$ ${dados.valor}`, 20, 168);
+    doc.text("Proposta válida por 7 dias", 20, 176);
+
+    // ===== ASSINATURA =====
+    doc.text("__________________________", 20, 200);
+    doc.text("Assinatura", 20, 208);
+
+    doc.save(`proposta_${dados.nome}.pdf`);
+  }
+</script>
+
+</body>
+</html>
