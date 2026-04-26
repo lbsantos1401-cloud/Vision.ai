@@ -1,148 +1,157 @@
-<!DOCTYPE html>
-<html lang="pt-BR">
-<head>
-  <meta charset="UTF-8">
-  <title>Gerador de Orçamento</title>
 
-  <!-- jsPDF -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      background: #0f172a;
-      color: white;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      height: 100vh;
-      margin: 0;
-    }
+<!DOCTYPE html>  <html lang="pt-BR">  
+<head>  
+  <meta charset="UTF-8">  
+  <title>Gerador de Orçamento</title>    <!-- jsPDF -->    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>    <style>  
+    body {  
+      font-family: Arial, sans-serif;  
+      background: #0f172a;  
+      color: white;  
+      display: flex;  
+      justify-content: center;  
+      align-items: center;  
+      height: 100vh;  
+      margin: 0;  
+    }  
+  
+    .container {  
+      background: #1e293b;  
+      padding: 25px;  
+      border-radius: 12px;  
+      width: 320px;  
+      box-shadow: 0 0 20px rgba(0,0,0,0.4);  
+    }  
+  
+    h1 {  
+      text-align: center;  
+      margin-bottom: 15px;  
+    }  
+  
+    input {  
+      width: 100%;  
+      margin: 6px 0;  
+      padding: 10px;  
+      border: none;  
+      border-radius: 6px;  
+      outline: none;  
+    }  
+  
+    button {  
+      width: 100%;  
+      padding: 12px;  
+      background: #22c55e;  
+      border: none;  
+      border-radius: 6px;  
+      cursor: pointer;  
+      margin-top: 12px;  
+      font-weight: bold;  
+      transition: 0.2s;  
+    }  
+  
+    button:hover {  
+      background: #16a34a;  
+    }  
+  </style>  </head>  <body>  <div class="container">  
+  <h1>Gerar Proposta</h1>    <input id="nome" placeholder="Nome do cliente">  
+  <input id="endereco" placeholder="Endereço">  
+  <input id="consumo" placeholder="Consumo médio (kWh)">  
+  <input id="verao" placeholder="Consumo verão">  
+  <input id="inverno" placeholder="Consumo inverno">  
+  <input id="area" placeholder="Área disponível (m²)">  
+  <input id="valor" placeholder="Valor do projeto">  <button onclick="gerarPDF()">Gerar PDF</button>
 
-    .container {
-      background: #1e293b;
-      padding: 25px;
-      border-radius: 12px;
-      width: 320px;
-      box-shadow: 0 0 20px rgba(0,0,0,0.4);
-    }
-
-    h1 {
-      text-align: center;
-      margin-bottom: 15px;
-    }
-
-    input {
-      width: 100%;
-      margin: 6px 0;
-      padding: 10px;
-      border: none;
-      border-radius: 6px;
-      outline: none;
-    }
-
-    button {
-      width: 100%;
-      padding: 12px;
-      background: #22c55e;
-      border: none;
-      border-radius: 6px;
-      cursor: pointer;
-      margin-top: 12px;
-      font-weight: bold;
-      transition: 0.2s;
-    }
-
-    button:hover {
-      background: #16a34a;
-    }
-  </style>
-</head>
-
-<body>
-
-<div class="container">
-  <h1>Gerar Proposta</h1>
-
-  <input id="nome" placeholder="Nome do cliente">
-  <input id="endereco" placeholder="Endereço">
-  <input id="consumo" placeholder="Consumo médio (kWh)">
-  <input id="verao" placeholder="Consumo verão">
-  <input id="inverno" placeholder="Consumo inverno">
-  <input id="area" placeholder="Área disponível (m²)">
-  <input id="valor" placeholder="Valor do projeto">
-
-  <button onclick="gerarPDF()">Gerar PDF</button>
-</div>
-
-<script>
-  const { jsPDF } = window.jspdf;
-
-  function gerarPDF() {
-
-    const dados = {
-      nome: document.getElementById("nome").value,
-      endereco: document.getElementById("endereco").value,
-      consumo: document.getElementById("consumo").value,
-      verao: document.getElementById("verao").value,
-      inverno: document.getElementById("inverno").value,
-      area: document.getElementById("area").value,
-      valor: document.getElementById("valor").value
-    };
-
-    const doc = new jsPDF();
-
-    // ===== TÍTULO =====
-    doc.setFontSize(18);
-    doc.text("PROPOSTA COMERCIAL", 20, 20);
-
-    // ===== CLIENTE =====
-    doc.setFontSize(12);
-    doc.text(`Cliente: ${dados.nome}`, 20, 30);
-    doc.text(`Endereço: ${dados.endereco}`, 20, 36);
-
-    // ===== ANÁLISE =====
-    doc.setFontSize(14);
-    doc.text("ANÁLISE DO PROJETO", 20, 50);
-
-    doc.setFontSize(11);
-    doc.text(`Consumo médio: ${dados.consumo} kWh`, 20, 58);
-    doc.text(`Verão: ${dados.verao} kWh`, 20, 64);
-    doc.text(`Inverno: ${dados.inverno} kWh`, 20, 70);
-    doc.text(`Área disponível: ${dados.area} m²`, 20, 76);
-
-    // ===== PROJETO =====
-    doc.setFontSize(14);
-    doc.text("SEU PROJETO", 20, 90);
-
-    doc.setFontSize(11);
-    doc.text("Sistema fotovoltaico dimensionado para geração eficiente.", 20, 98);
-
-    // ===== SERVIÇOS =====
-    doc.setFontSize(14);
-    doc.text("SERVIÇO COMPLETO", 20, 115);
-
-    doc.setFontSize(11);
-    doc.text("- Projeto fotovoltaico", 20, 123);
-    doc.text("- Instalação completa", 20, 129);
-    doc.text("- Homologação", 20, 135);
-    doc.text("- Monitoramento 1 ano", 20, 141);
-
-    // ===== FINANCEIRO =====
-    doc.setFontSize(14);
-    doc.text("FINANCEIRO", 20, 160);
-
-    doc.setFontSize(11);
-    doc.text(`Valor do projeto: R$ ${dados.valor}`, 20, 168);
-    doc.text("Proposta válida por 7 dias", 20, 176);
-
-    // ===== ASSINATURA =====
-    doc.text("__________________________", 20, 200);
-    doc.text("Assinatura", 20, 208);
-
-    doc.save(`proposta_${dados.nome}.pdf`);
-  }
+</div>  <script>  
+const { jsPDF } = window.jspdf;  
+  
+function gerarPDF() {  
+  
+  const dados = {  
+    nome: document.getElementById("nome").value,  
+    endereco: document.getElementById("endereco").value,  
+    consumo: document.getElementById("consumo").value,  
+    verao: document.getElementById("verao").value,  
+    inverno: document.getElementById("inverno").value,  
+    area: document.getElementById("area").value,  
+    valor: document.getElementById("valor").value  
+  };  
+  
+  const doc = new jsPDF();  
+  
+  // ===== HEADER =====  
+  doc.setFontSize(16);  
+  doc.text("PROPOSTA ENERGIA SOLAR", 20, 15);  
+  
+  doc.setFontSize(10);  
+  doc.text(`${dados.nome}`, 20, 25);  
+  doc.text(`${dados.endereco}`, 20, 30);  
+  
+  const data = new Date().toLocaleDateString();  
+  doc.text(`Data: ${data}`, 150, 25);  
+  
+  // Linha divisória  
+  doc.line(20, 35, 190, 35);  
+  
+  // ===== ANÁLISE =====  
+  doc.setFontSize(13);  
+  doc.text("ANÁLISE PARA SEU PROJETO", 20, 45);  
+  
+  doc.setFontSize(10);  
+  doc.text(`Consumo médio: ${dados.consumo} kWh`, 20, 55);  
+  doc.text(`Verão: ${dados.verao} kWh`, 20, 60);  
+  doc.text(`Inverno: ${dados.inverno} kWh`, 20, 65);  
+  doc.text(`Área disponível: ${dados.area} m²`, 20, 70);  
+  doc.text(`Aproveitamento: 97%`, 20, 75);  
+  
+  // Caixa visual  
+  doc.rect(15, 40, 180, 40);  
+  
+  // ===== PROJETO =====  
+  doc.setFontSize(13);  
+  doc.text("SEU PROJETO", 20, 95);  
+  
+  doc.setFontSize(10);  
+  doc.text("Geração estimada: 550 kWh/mês", 20, 105);  
+  doc.text("Módulos: 10x 585W", 20, 110);  
+  doc.text("Inversor: 5kW", 20, 115);  
+  
+  doc.rect(15, 90, 180, 35);  
+  
+  // ===== SERVIÇOS =====  
+  doc.setFontSize(13);  
+  doc.text("SERVIÇO COMPLETO", 20, 140);  
+  
+  doc.setFontSize(10);  
+  doc.text("- Projeto fotovoltaico", 20, 150);  
+  doc.text("- Instalação completa", 20, 155);  
+  doc.text("- Homologação", 20, 160);  
+  doc.text("- Monitoramento 1 ano", 20, 165);  
+  
+  // ===== GARANTIAS =====  
+  doc.setFontSize(13);  
+  doc.text("GARANTIAS", 110, 140);  
+  
+  doc.setFontSize(10);  
+  doc.text("- Inversor: 10 anos", 110, 150);  
+  doc.text("- Módulos: 12 anos", 110, 155);  
+  doc.text("- Eficiência: 30 anos", 110, 160);  
+  
+  // ===== FINANCEIRO =====  
+  doc.setFontSize(13);  
+  doc.text("FINANCEIRO", 20, 180);  
+  
+  doc.setFontSize(11);  
+  doc.text(`Valor do projeto: R$ ${dados.valor}`, 20, 190);  
+  doc.text("Payback: ~2,5 anos", 20, 195);  
+  
+  // ===== TERMO =====  
+  doc.setFontSize(9);  
+  doc.text("Proposta válida por 7 dias.", 20, 210);  
+  
+  // ===== ASSINATURA =====  
+  doc.line(20, 260, 80, 260);  
+  doc.text("Assinatura", 20, 265);  
+  
+  doc.save(`proposta_${dados.nome}.pdf`);  
+}  
 </script>
-
-</body>
-</html>
