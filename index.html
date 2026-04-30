@@ -2,7 +2,7 @@
 <html lang="pt-BR">
 <head>
 <meta charset="UTF-8">
-<title>Proposta Solar PRO</title>
+<title>Orçamento Profissional</title>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 
@@ -21,7 +21,11 @@ body {
   background: #1e293b;
   padding: 25px;
   border-radius: 12px;
-  width: 320px;
+  width: 340px;
+}
+
+h2 {
+  color: white;
 }
 
 input {
@@ -47,12 +51,14 @@ button {
 <body>
 
 <div class="container">
-<h2>Proposta Solar</h2>
+<h2>Gerar Orçamento</h2>
 
-<input id="nome" placeholder="Nome do cliente">
-<input id="endereco" placeholder="Endereço">
-<input id="consumo" placeholder="Consumo médio (kWh)">
-<input id="valor" placeholder="Valor do projeto">
+<input id="servico" placeholder="Tipo de serviço">
+<input id="tempo" placeholder="Tempo estimado">
+<input id="material" placeholder="Material necessário">
+<input id="valorMaterial" placeholder="Valor médio do material">
+<input id="maoDeObra" placeholder="Valor da mão de obra">
+<input id="valorTotal" placeholder="Valor total">
 
 <button onclick="gerarPDF()">Gerar PDF</button>
 </div>
@@ -63,128 +69,98 @@ const { jsPDF } = window.jspdf;
 function gerarPDF() {
 
 const dados = {
-  nome: document.getElementById("nome").value,
-  endereco: document.getElementById("endereco").value,
-  consumo: document.getElementById("consumo").value,
-  valor: document.getElementById("valor").value
+  servico: document.getElementById("servico").value,
+  tempo: document.getElementById("tempo").value,
+  material: document.getElementById("material").value,
+  valorMaterial: document.getElementById("valorMaterial").value,
+  maoDeObra: document.getElementById("maoDeObra").value,
+  valorTotal: document.getElementById("valorTotal").value
 };
 
 const doc = new jsPDF();
 
 // ===== CORES =====
 const azul = [30, 58, 138];
-const verde = [34, 197, 94];
+
+// ===== LOGO (SUBSTITUIR BASE64) =====
+const logoBase64 = ""; // COLE AQUI SUA LOGO EM BASE64
+
+if (logoBase64) {
+  doc.addImage(logoBase64, "PNG", 15, 10, 40, 20);
+}
 
 // ===== HEADER =====
 doc.setFillColor(...azul);
-doc.rect(0, 0, 210, 28, "F");
+doc.rect(0, 0, 210, 35, "F");
 
 doc.setTextColor(255,255,255);
 doc.setFontSize(14);
 doc.setFont(undefined, "bold");
-doc.text("BS ENERGIA SOLAR", 20, 15);
+doc.text("ORÇAMENTO DE SERVIÇO", 105, 20, { align: "center" });
 
-doc.setFontSize(10);
-doc.setFont(undefined, "normal");
-doc.text("Proposta Comercial", 20, 22);
-
-// ===== LOGO (simulado) =====
-doc.setFillColor(255,255,255);
-doc.rect(160, 5, 30, 18); // espaço do logo
 doc.setTextColor(0,0,0);
-doc.setFontSize(8);
-doc.text("LOGO", 170, 15);
 
-// ===== CLIENTE =====
-doc.setTextColor(0,0,0);
+// ===== DATA =====
 doc.setFontSize(10);
-doc.text(dados.nome, 20, 40);
-doc.text(dados.endereco, 20, 45, { maxWidth: 170 });
+doc.text("Data: " + new Date().toLocaleDateString(), 150, 45);
 
-// ===== ANÁLISE =====
+// ===== BLOCO PRINCIPAL =====
 doc.setFontSize(12);
 doc.setFont(undefined, "bold");
-doc.text("ANÁLISE DO PROJETO", 20, 60);
+doc.text("DETALHES DO SERVIÇO", 20, 60);
 
-doc.rect(15, 65, 180, 35);
+doc.rect(15, 65, 180, 100);
+
+let y = 75;
 
 doc.setFontSize(10);
 doc.setFont(undefined, "normal");
 
-doc.text(`Consumo médio: ${dados.consumo} kWh`, 20, 75);
-doc.text("Aproveitamento: 97%", 20, 82);
-doc.text("Posição solar: Norte", 20, 89);
+// ===== FUNÇÃO PRA EXIBIR APENAS SE PREENCHIDO =====
+function addLinha(label, valor) {
+  if (valor) {
+    doc.setFont(undefined, "bold");
+    doc.text(label, 20, y);
 
-// ===== PROJETO =====
-doc.setFontSize(12);
-doc.setFont(undefined, "bold");
-doc.text("SEU PROJETO", 20, 110);
+    doc.setFont(undefined, "normal");
+    doc.text(valor, 80, y, { maxWidth: 100 });
 
-doc.rect(15, 115, 180, 35);
+    y += 8;
+  }
+}
 
-doc.setFontSize(10);
-doc.setFont(undefined, "normal");
+addLinha("Tipo de serviço:", dados.servico);
+addLinha("Tempo estimado:", dados.tempo);
+addLinha("Material necessário:", dados.material);
+addLinha("Valor do material:", dados.valorMaterial);
+addLinha("Mão de obra:", dados.maoDeObra);
 
-doc.text("Geração estimada: 554 kWh", 20, 125);
-doc.text("Sistema: 5,85 kWp", 20, 132);
-doc.text("Módulos: 10x 585W", 20, 139);
+// ===== VALOR TOTAL DESTACADO =====
+if (dados.valorTotal) {
+  y += 10;
 
-// ===== FINANCEIRO =====
-doc.setFontSize(12);
-doc.setFont(undefined, "bold");
-doc.text("RETORNO FINANCEIRO", 20, 160);
+  doc.setFontSize(12);
+  doc.setFont(undefined, "bold");
 
-doc.rect(15, 165, 180, 50);
+  const valorFormatado = Number(dados.valorTotal || 0).toLocaleString("pt-BR", {
+    style: "currency",
+    currency: "BRL"
+  });
 
-const valorFormatado = Number(dados.valor || 0).toLocaleString("pt-BR", {
-  style: "currency",
-  currency: "BRL"
-});
+  doc.text("VALOR TOTAL:", 20, y);
+  doc.text(valorFormatado, 80, y);
+}
 
-doc.setFontSize(12);
-doc.setFont(undefined, "bold");
-doc.text(valorFormatado, 20, 175);
-
+// ===== RODAPÉ =====
 doc.setFontSize(9);
 doc.setFont(undefined, "normal");
-doc.text("Valor do projeto", 20, 182);
-
-// ===== GRÁFICO SIMULADO =====
-let baseY = 210;
-
-// eixo
-doc.line(20, baseY, 190, baseY);
-doc.line(20, baseY, 20, baseY - 40);
-
-// barras (simulação crescimento economia)
-doc.setFillColor(...verde);
-
-let valores = [10, 20, 30, 50, 80];
-
-valores.forEach((v, i) => {
-  doc.rect(30 + i*25, baseY - v, 10, v, "F");
-});
-
-// labels
-doc.setFontSize(8);
-doc.text("5 anos", 30, baseY + 5);
-doc.text("25 anos", 130, baseY + 5);
-
-// ===== GANHOS =====
-doc.setFontSize(10);
-doc.setFont(undefined, "bold");
-doc.text("Economia estimada:", 20, baseY - 45);
-
-doc.setFontSize(9);
-doc.setFont(undefined, "normal");
-doc.text("R$ 22.807 em 5 anos", 20, baseY - 38);
-doc.text("R$ 622.500 em 25 anos", 20, baseY - 32);
+doc.text("Orçamento válido por 7 dias.", 20, 280);
 
 // ===== ASSINATURA =====
-doc.line(20, 280, 80, 280);
-doc.text("Assinatura", 20, 285);
+doc.line(20, 260, 80, 260);
+doc.text("Assinatura", 20, 265);
 
-doc.save(`proposta_${dados.nome}.pdf`);
+doc.save("orcamento.pdf");
 }
 </script>
 
