@@ -24,10 +24,6 @@ body {
   width: 340px;
 }
 
-h2 {
-  color: white;
-}
-
 input {
   width: 100%;
   margin: 6px 0;
@@ -51,14 +47,15 @@ button {
 <body>
 
 <div class="container">
-<h2>Gerar Orçamento</h2>
+<h2>Orçamento</h2>
 
+<input id="cliente" placeholder="Nome do cliente">
 <input id="servico" placeholder="Tipo de serviço">
 <input id="tempo" placeholder="Tempo estimado">
 <input id="material" placeholder="Material necessário">
-<input id="valorMaterial" placeholder="Valor médio do material">
-<input id="maoDeObra" placeholder="Valor da mão de obra">
-<input id="valorTotal" placeholder="Valor total">
+<input id="valorMaterial" placeholder="Valor material">
+<input id="maoObra" placeholder="Mão de obra">
+<input id="total" placeholder="Valor total">
 
 <button onclick="gerarPDF()">Gerar PDF</button>
 </div>
@@ -69,98 +66,100 @@ const { jsPDF } = window.jspdf;
 function gerarPDF() {
 
 const dados = {
-  servico: document.getElementById("servico").value,
-  tempo: document.getElementById("tempo").value,
-  material: document.getElementById("material").value,
-  valorMaterial: document.getElementById("valorMaterial").value,
-  maoDeObra: document.getElementById("maoDeObra").value,
-  valorTotal: document.getElementById("valorTotal").value
+  cliente: cliente.value,
+  servico: servico.value,
+  tempo: tempo.value,
+  material: material.value,
+  valorMaterial: valorMaterial.value,
+  maoObra: maoObra.value,
+  total: total.value
 };
+
+// 🔴 COLE SUA LOGO AQUI
+const logo = "data:image/png;base64,COLE_AQUI_SEU_BASE64";
 
 const doc = new jsPDF();
 
 // ===== CORES =====
-const azul = [30, 58, 138];
+const azul = [15, 23, 42];
+const verde = [34, 197, 94];
 
-// ===== LOGO (SUBSTITUIR BASE64) =====
-const logoBase64 = ""; // COLE AQUI SUA LOGO EM BASE64
-
-if (logoBase64) {
-  doc.addImage(logoBase64, "PNG", 15, 10, 40, 20);
-}
+// ===== MARCA D'ÁGUA =====
+doc.setGState(new doc.GState({ opacity: 0.05 }));
+doc.addImage(logo, "PNG", 30, 80, 150, 100);
+doc.setGState(new doc.GState({ opacity: 1 }));
 
 // ===== HEADER =====
 doc.setFillColor(...azul);
-doc.rect(0, 0, 210, 35, "F");
+doc.rect(0, 0, 210, 30, "F");
+
+doc.addImage(logo, "PNG", 15, 5, 30, 15);
 
 doc.setTextColor(255,255,255);
 doc.setFontSize(14);
 doc.setFont(undefined, "bold");
-doc.text("ORÇAMENTO DE SERVIÇO", 105, 20, { align: "center" });
+doc.text("ORÇAMENTO DE SERVIÇO", 60, 15);
+
+// ===== FUNÇÃO CARD =====
+function card(x, y, w, h) {
+  doc.setFillColor(200,200,200);
+  doc.roundedRect(x+2, y+2, w, h, 3, 3, "F");
+
+  doc.setFillColor(255,255,255);
+  doc.roundedRect(x, y, w, h, 3, 3, "F");
+}
+
+// ===== CLIENTE =====
+card(15, 40, 180, 25);
+
+doc.setTextColor(0,0,0);
+doc.setFontSize(10);
+doc.text(`Cliente: ${dados.cliente}`, 20, 50);
+
+// ===== SERVIÇO =====
+card(15, 70, 180, 60);
+
+let y = 80;
+
+if(dados.servico){
+  doc.text(`Serviço: ${dados.servico}`, 20, y); y+=7;
+}
+if(dados.tempo){
+  doc.text(`Tempo: ${dados.tempo}`, 20, y); y+=7;
+}
+if(dados.material){
+  doc.text(`Material: ${dados.material}`, 20, y); y+=7;
+}
+
+// ===== VALORES =====
+card(15, 135, 180, 55);
+
+doc.setFillColor(...verde);
+doc.rect(15, 135, 180, 8, "F");
+
+doc.setTextColor(255,255,255);
+doc.setFontSize(10);
+doc.text("VALORES", 20, 141);
 
 doc.setTextColor(0,0,0);
 
-// ===== DATA =====
-doc.setFontSize(10);
-doc.text("Data: " + new Date().toLocaleDateString(), 150, 45);
+let y2 = 155;
 
-// ===== BLOCO PRINCIPAL =====
-doc.setFontSize(12);
-doc.setFont(undefined, "bold");
-doc.text("DETALHES DO SERVIÇO", 20, 60);
-
-doc.rect(15, 65, 180, 100);
-
-let y = 75;
-
-doc.setFontSize(10);
-doc.setFont(undefined, "normal");
-
-// ===== FUNÇÃO PRA EXIBIR APENAS SE PREENCHIDO =====
-function addLinha(label, valor) {
-  if (valor) {
-    doc.setFont(undefined, "bold");
-    doc.text(label, 20, y);
-
-    doc.setFont(undefined, "normal");
-    doc.text(valor, 80, y, { maxWidth: 100 });
-
-    y += 8;
-  }
+if(dados.valorMaterial){
+  doc.text(`Material: R$ ${dados.valorMaterial}`, 20, y2); y2+=8;
+}
+if(dados.maoObra){
+  doc.text(`Mão de obra: R$ ${dados.maoObra}`, 20, y2); y2+=8;
 }
 
-addLinha("Tipo de serviço:", dados.servico);
-addLinha("Tempo estimado:", dados.tempo);
-addLinha("Material necessário:", dados.material);
-addLinha("Valor do material:", dados.valorMaterial);
-addLinha("Mão de obra:", dados.maoDeObra);
-
-// ===== VALOR TOTAL DESTACADO =====
-if (dados.valorTotal) {
-  y += 10;
-
-  doc.setFontSize(12);
-  doc.setFont(undefined, "bold");
-
-  const valorFormatado = Number(dados.valorTotal || 0).toLocaleString("pt-BR", {
-    style: "currency",
-    currency: "BRL"
-  });
-
-  doc.text("VALOR TOTAL:", 20, y);
-  doc.text(valorFormatado, 80, y);
+if(dados.total){
+  doc.setFontSize(16);
+  doc.setTextColor(...verde);
+  doc.text(`TOTAL: R$ ${dados.total}`, 20, y2+10);
 }
 
-// ===== RODAPÉ =====
-doc.setFontSize(9);
-doc.setFont(undefined, "normal");
-doc.text("Orçamento válido por 7 dias.", 20, 280);
-
-// ===== ASSINATURA =====
-doc.line(20, 260, 80, 260);
-doc.text("Assinatura", 20, 265);
-
-doc.save("orcamento.pdf");
+// ===== SALVAR =====
+doc.save(`orcamento_${dados.cliente}.pdf`);
 }
 </script>
 
