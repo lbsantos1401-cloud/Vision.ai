@@ -1,167 +1,34 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-<meta charset="UTF-8">
-<title>Orçamento Profissional</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <title>Gerador de PDF</title>
 
-<style>
-body {
-  font-family: Arial;
-  background: #0f172a;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  height: 100vh;
-  margin: 0;
-}
-
-.container {
-  background: #1e293b;
-  padding: 25px;
-  border-radius: 12px;
-  width: 340px;
-}
-
-input {
-  width: 100%;
-  margin: 6px 0;
-  padding: 10px;
-  border-radius: 6px;
-  border: none;
-}
-
-button {
-  width: 100%;
-  padding: 12px;
-  background: #22c55e;
-  border: none;
-  border-radius: 6px;
-  margin-top: 10px;
-  cursor: pointer;
-}
-</style>
+  <link rel="stylesheet" href="style.css">
 </head>
 
 <body>
 
-<div class="container">
-<h2>Orçamento</h2>
+  <div class="container">
 
-<input id="cliente" placeholder="Nome do cliente">
-<input id="servico" placeholder="Tipo de serviço">
-<input id="tempo" placeholder="Tempo estimado">
-<input id="material" placeholder="Material necessário">
-<input id="valorMaterial" placeholder="Valor material">
-<input id="maoObra" placeholder="Mão de obra">
-<input id="total" placeholder="Valor total">
+    <header>
+      <h1>Gerador de PDF</h1>
+      <p>Organize e gere relatórios fotográficos automaticamente.</p>
+    </header>
 
-<button onclick="gerarPDF()">Gerar PDF</button>
-</div>
+    <div id="uploadGrid" class="upload-grid"></div>
 
-<script>
-const { jsPDF } = window.jspdf;
+    <button id="generateBtn">
+      Gerar PDF
+    </button>
 
-function gerarPDF() {
+  </div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+ 
 
-const dados = {
-  cliente: cliente.value,
-  servico: servico.value,
-  tempo: tempo.value,
-  material: material.value,
-  valorMaterial: valorMaterial.value,
-  maoObra: maoObra.value,
-  total: total.value
-};
-
-// 🔴 COLE SUA LOGO AQUI
-const logo = "data:image/png;base64,COLE_AQUI_SEU_BASE64";
-
-const doc = new jsPDF();
-
-// ===== CORES =====
-const azul = [15, 23, 42];
-const verde = [34, 197, 94];
-
-// ===== MARCA D'ÁGUA =====
-doc.setGState(new doc.GState({ opacity: 0.05 }));
-doc.addImage(logo, "PNG", 30, 80, 150, 100);
-doc.setGState(new doc.GState({ opacity: 1 }));
-
-// ===== HEADER =====
-doc.setFillColor(...azul);
-doc.rect(0, 0, 210, 30, "F");
-
-doc.addImage(logo, "PNG", 15, 5, 30, 15);
-
-doc.setTextColor(255,255,255);
-doc.setFontSize(14);
-doc.setFont(undefined, "bold");
-doc.text("ORÇAMENTO DE SERVIÇO", 60, 15);
-
-// ===== FUNÇÃO CARD =====
-function card(x, y, w, h) {
-  doc.setFillColor(200,200,200);
-  doc.roundedRect(x+2, y+2, w, h, 3, 3, "F");
-
-  doc.setFillColor(255,255,255);
-  doc.roundedRect(x, y, w, h, 3, 3, "F");
-}
-
-// ===== CLIENTE =====
-card(15, 40, 180, 25);
-
-doc.setTextColor(0,0,0);
-doc.setFontSize(10);
-doc.text(`Cliente: ${dados.cliente}`, 20, 50);
-
-// ===== SERVIÇO =====
-card(15, 70, 180, 60);
-
-let y = 80;
-
-if(dados.servico){
-  doc.text(`Serviço: ${dados.servico}`, 20, y); y+=7;
-}
-if(dados.tempo){
-  doc.text(`Tempo: ${dados.tempo}`, 20, y); y+=7;
-}
-if(dados.material){
-  doc.text(`Material: ${dados.material}`, 20, y); y+=7;
-}
-
-// ===== VALORES =====
-card(15, 135, 180, 55);
-
-doc.setFillColor(...verde);
-doc.rect(15, 135, 180, 8, "F");
-
-doc.setTextColor(255,255,255);
-doc.setFontSize(10);
-doc.text("VALORES", 20, 141);
-
-doc.setTextColor(0,0,0);
-
-let y2 = 155;
-
-if(dados.valorMaterial){
-  doc.text(`Material: R$ ${dados.valorMaterial}`, 20, y2); y2+=8;
-}
-if(dados.maoObra){
-  doc.text(`Mão de obra: R$ ${dados.maoObra}`, 20, y2); y2+=8;
-}
-
-if(dados.total){
-  doc.setFontSize(16);
-  doc.setTextColor(...verde);
-  doc.text(`TOTAL: R$ ${dados.total}`, 20, y2+10);
-}
-
-// ===== SALVAR =====
-doc.save(`orcamento_${dados.cliente}.pdf`);
-}
-</script>
+  <script src="script.js"></script>
 
 </body>
 </html>
