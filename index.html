@@ -19,95 +19,234 @@
     }
 
     body {
-      background: #0f1117;
+
+      background:
+        radial-gradient(circle at top,
+          rgba(91, 140, 255, 0.15),
+          transparent 30%),
+        #0b0f19;
+
       color: white;
+
       min-height: 100vh;
-      padding: 30px;
+
+      overflow-x: hidden;
+
+      padding: 20px;
+    }
+
+    .background-glow {
+
+      position: fixed;
+
+      width: 600px;
+      height: 600px;
+
+      background: rgba(91, 140, 255, 0.12);
+
+      filter: blur(120px);
+
+      border-radius: 50%;
+
+      top: -200px;
+      left: -100px;
+
+      z-index: -1;
+
+      animation: floatGlow 10s ease-in-out infinite;
+    }
+
+    @keyframes floatGlow {
+
+      0% {
+        transform: translateY(0px) translateX(0px);
+      }
+
+      50% {
+        transform: translateY(40px) translateX(30px);
+      }
+
+      100% {
+        transform: translateY(0px) translateX(0px);
+      }
+
     }
 
     .container {
-      max-width: 1200px;
+      max-width: 1250px;
       margin: auto;
     }
 
     header {
       text-align: center;
-      margin-bottom: 40px;
+      margin-bottom: 50px;
+      animation: fadeIn 1s ease;
     }
 
-    header h1 {
-      font-size: 42px;
-      margin-bottom: 10px;
-      color: #ffffff;
-    }
+    .logo {
 
-    header p {
-      color: #9ca3af;
-      font-size: 16px;
-    }
+      width: 90px;
+      height: 90px;
 
-    .upload-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-      gap: 20px;
-    }
+      margin: auto;
+      margin-bottom: 20px;
 
-    .upload-card {
-      background: #1a1d29;
-      border: 1px solid #2b3142;
-      border-radius: 20px;
-      padding: 20px;
-      transition: 0.3s;
-      box-shadow: 0 0 20px rgba(0,0,0,0.25);
-    }
+      border-radius: 30px;
 
-    .upload-card:hover {
-      transform: translateY(-5px);
-      border-color: #5b8cff;
-      box-shadow: 0 0 25px rgba(91, 140, 255, 0.2);
-    }
+      background:
+        linear-gradient(135deg,
+          #5b8cff,
+          #7c5cff);
 
-    .upload-title {
-      margin-bottom: 15px;
-      font-size: 18px;
-      font-weight: bold;
-      color: #ffffff;
-    }
-
-    .upload-label {
       display: flex;
       align-items: center;
       justify-content: center;
 
+      font-size: 40px;
+
+      box-shadow:
+        0 0 40px rgba(91, 140, 255, 0.45);
+
+      animation: pulse 4s infinite;
+    }
+
+    @keyframes pulse {
+
+      0% {
+        box-shadow: 0 0 30px rgba(91, 140, 255, 0.35);
+      }
+
+      50% {
+        box-shadow: 0 0 55px rgba(91, 140, 255, 0.6);
+      }
+
+      100% {
+        box-shadow: 0 0 30px rgba(91, 140, 255, 0.35);
+      }
+
+    }
+
+    header h1 {
+      font-size: 46px;
+      margin-bottom: 12px;
+      font-weight: bold;
+    }
+
+    header p {
+      color: #9ca3af;
+      font-size: 17px;
+    }
+
+    .upload-grid {
+
+      display: grid;
+
+      grid-template-columns:
+        repeat(auto-fit, minmax(260px, 1fr));
+
+      gap: 22px;
+    }
+
+    .upload-card {
+
+      background: rgba(26, 29, 41, 0.8);
+
+      backdrop-filter: blur(12px);
+
+      border: 1px solid rgba(255,255,255,0.05);
+
+      border-radius: 24px;
+
+      padding: 20px;
+
+      transition: 0.35s ease;
+
+      animation: fadeUp 0.6s ease;
+    }
+
+    .upload-card:hover {
+
+      transform:
+        translateY(-6px)
+        scale(1.01);
+
+      border-color: rgba(91, 140, 255, 0.5);
+
+      box-shadow:
+        0 0 35px rgba(91, 140, 255, 0.2);
+    }
+
+    .upload-title {
+
+      font-size: 18px;
+      font-weight: bold;
+
+      margin-bottom: 15px;
+    }
+
+    .upload-label {
+
       width: 100%;
-      height: 180px;
+      height: 200px;
+
+      border-radius: 20px;
 
       border: 2px dashed #3a4257;
-      border-radius: 16px;
+
+      display: flex;
+      align-items: center;
+      justify-content: center;
 
       cursor: pointer;
+
       overflow: hidden;
+
+      position: relative;
 
       transition: 0.3s;
 
-      background: #12151f;
+      background: rgba(255,255,255,0.02);
     }
 
     .upload-label:hover {
+
       border-color: #5b8cff;
-      background: #151a27;
+
+      background: rgba(91,140,255,0.08);
+    }
+
+    .upload-label.dragover {
+
+      border-color: #7aa2ff;
+
+      background: rgba(91,140,255,0.15);
+
+      transform: scale(1.02);
     }
 
     .upload-label span {
+
       color: #9ca3af;
+
       text-align: center;
-      padding: 10px;
+
+      padding: 20px;
+
+      font-size: 15px;
     }
 
     .upload-label img {
+
       width: 100%;
       height: 100%;
+
       object-fit: cover;
+
+      transition: 0.4s;
+    }
+
+    .upload-label img:hover {
+      transform: scale(1.04);
     }
 
     input[type="file"] {
@@ -115,14 +254,21 @@
     }
 
     #generateBtn {
-      margin-top: 40px;
+
+      margin-top: 45px;
+
       width: 100%;
-      padding: 18px;
+
+      padding: 20px;
 
       border: none;
-      border-radius: 18px;
 
-      background: linear-gradient(135deg, #5b8cff, #7c5cff);
+      border-radius: 22px;
+
+      background:
+        linear-gradient(135deg,
+          #5b8cff,
+          #7c5cff);
 
       color: white;
 
@@ -131,34 +277,119 @@
 
       cursor: pointer;
 
-      transition: 0.3s;
+      transition: 0.35s;
+
+      position: relative;
+
+      overflow: hidden;
     }
 
     #generateBtn:hover {
-      transform: scale(1.01);
-      opacity: 0.95;
-      box-shadow: 0 0 25px rgba(91, 140, 255, 0.35);
+
+      transform: translateY(-3px);
+
+      box-shadow:
+        0 0 35px rgba(91,140,255,0.35);
+    }
+
+    #generateBtn.loading {
+
+      pointer-events: none;
+
+      opacity: 0.8;
+    }
+
+    .loader {
+
+      width: 22px;
+      height: 22px;
+
+      border: 3px solid rgba(255,255,255,0.3);
+
+      border-top: 3px solid white;
+
+      border-radius: 50%;
+
+      animation: spin 1s linear infinite;
+
+      margin: auto;
+    }
+
+    @keyframes spin {
+
+      from {
+        transform: rotate(0deg);
+      }
+
+      to {
+        transform: rotate(360deg);
+      }
+
+    }
+
+    @keyframes fadeIn {
+
+      from {
+        opacity: 0;
+        transform: translateY(-10px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+
+    }
+
+    @keyframes fadeUp {
+
+      from {
+        opacity: 0;
+        transform: translateY(25px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+
     }
 
     .footer {
+
       text-align: center;
+
       margin-top: 30px;
+
       color: #6b7280;
+
       font-size: 14px;
     }
 
-    @media (max-width: 700px) {
+    @media (max-width: 768px) {
 
       body {
-        padding: 20px;
+        padding: 16px;
       }
 
       header h1 {
-        font-size: 32px;
+        font-size: 34px;
+      }
+
+      header p {
+        font-size: 15px;
+      }
+
+      .upload-grid {
+        gap: 16px;
       }
 
       .upload-label {
-        height: 160px;
+        height: 170px;
+      }
+
+      #generateBtn {
+        padding: 18px;
       }
 
     }
@@ -168,13 +399,22 @@
 
 <body>
 
+  <div class="background-glow"></div>
+
   <div class="container">
 
     <header>
+
+      <div class="logo">
+        📄
+      </div>
+
       <h1>Gerador de PDF</h1>
+
       <p>
-        Organize imagens e gere relatórios fotográficos automaticamente.
+        Sistema inteligente para relatórios fotográficos
       </p>
+
     </header>
 
     <div id="uploadGrid" class="upload-grid"></div>
@@ -184,7 +424,7 @@
     </button>
 
     <div class="footer">
-      Sistema de Relatório Fotográfico
+      Powered by AI Workflow
     </div>
 
   </div>
@@ -201,22 +441,29 @@
       "Placa no Poste"
     ];
 
-    const uploadGrid = document.getElementById("uploadGrid");
-
     const imagens = [];
+
+    const uploadGrid =
+      document.getElementById("uploadGrid");
+
 
     categorias.forEach((categoria, index) => {
 
-      const card = document.createElement("div");
+      const card =
+        document.createElement("div");
+
       card.classList.add("upload-card");
 
       card.innerHTML = `
+      
         <div class="upload-title">
           ${index + 1}. ${categoria}
         </div>
 
         <label class="upload-label" for="file-${index}">
-          <span>Selecionar Foto</span>
+          <span>
+            Clique ou arraste uma imagem
+          </span>
         </label>
 
         <input
@@ -224,117 +471,264 @@
           id="file-${index}"
           accept="image/*"
         >
+      
       `;
 
       uploadGrid.appendChild(card);
 
-      const input = card.querySelector("input");
-      const label = card.querySelector(".upload-label");
+      const input =
+        card.querySelector("input");
 
-      input.addEventListener("change", (event) => {
+      const label =
+        card.querySelector(".upload-label");
 
-        const file = event.target.files[0];
 
-        if (file) {
+      // CLICK NORMAL
 
-          const reader = new FileReader();
+      input.addEventListener(
+        "change",
+        (event) => {
 
-          reader.onload = function (e) {
+          const file =
+            event.target.files[0];
 
-            imagens[index] = e.target.result;
-
-            label.innerHTML = `
-              <img src="${e.target.result}">
-            `;
-
-          };
-
-          reader.readAsDataURL(file);
+          if (file) {
+            processarImagem(file, index, label);
+          }
 
         }
+      );
 
-      });
+
+      // DRAG AND DROP
+
+      label.addEventListener(
+        "dragover",
+        (e) => {
+
+          e.preventDefault();
+
+          label.classList.add("dragover");
+
+        }
+      );
+
+      label.addEventListener(
+        "dragleave",
+        () => {
+
+          label.classList.remove("dragover");
+
+        }
+      );
+
+      label.addEventListener(
+        "drop",
+        (e) => {
+
+          e.preventDefault();
+
+          label.classList.remove("dragover");
+
+          const file =
+            e.dataTransfer.files[0];
+
+          if (file) {
+            processarImagem(file, index, label);
+          }
+
+        }
+      );
 
     });
+
+
+    // ==========================
+    // COMPRESSÃO AUTOMÁTICA
+    // ==========================
+
+    function processarImagem(file, index, label) {
+
+      const reader = new FileReader();
+
+      reader.onload = function(event) {
+
+        const img = new Image();
+
+        img.src = event.target.result;
+
+        img.onload = function() {
+
+          const canvas =
+            document.createElement("canvas");
+
+          const ctx =
+            canvas.getContext("2d");
+
+          const maxWidth = 1400;
+
+          let width = img.width;
+          let height = img.height;
+
+          if (width > maxWidth) {
+
+            height *= maxWidth / width;
+
+            width = maxWidth;
+          }
+
+          canvas.width = width;
+          canvas.height = height;
+
+          ctx.drawImage(
+            img,
+            0,
+            0,
+            width,
+            height
+          );
+
+          const compressed =
+            canvas.toDataURL(
+              "image/jpeg",
+              0.75
+            );
+
+          imagens[index] = compressed;
+
+          label.innerHTML = `
+            <img src="${compressed}">
+          `;
+
+        };
+
+      };
+
+      reader.readAsDataURL(file);
+
+    }
 
 
     // ==========================
     // GERAR PDF
     // ==========================
 
-    document
-      .getElementById("generateBtn")
-      .addEventListener("click", gerarPDF);
+    const generateBtn =
+      document.getElementById("generateBtn");
+
+    generateBtn.addEventListener(
+      "click",
+      gerarPDF
+    );
 
 
     async function gerarPDF() {
 
-      const { jsPDF } = window.jspdf;
+      if (
+        imagens.filter(Boolean).length === 0
+      ) {
 
-      const pdf = new jsPDF({
-        orientation: "portrait",
-        unit: "mm",
-        format: "a4"
-      });
-
-      let primeiraPagina = true;
-
-      for (let i = 0; i < categorias.length; i++) {
-
-        const imagem = imagens[i];
-
-        if (!imagem) continue;
-
-        if (!primeiraPagina) {
-          pdf.addPage();
-        }
-
-        primeiraPagina = false;
-
-        // Fundo escuro da página
-        pdf.setFillColor(15, 17, 23);
-        pdf.rect(0, 0, 210, 297, "F");
-
-        // Título
-        pdf.setTextColor(255, 255, 255);
-        pdf.setFontSize(22);
-
-        pdf.text(
-          categorias[i],
-          105,
-          20,
-          { align: "center" }
+        alert(
+          "Adicione pelo menos uma imagem."
         );
 
-        // Configuração da imagem
-        const imgProps = pdf.getImageProperties(imagem);
-
-        const pdfWidth = 180;
-
-        const pdfHeight =
-          (imgProps.height * pdfWidth) / imgProps.width;
-
-        pdf.addImage(
-          imagem,
-          "JPEG",
-          15,
-          35,
-          pdfWidth,
-          pdfHeight
-        );
-
-      }
-
-      if (primeiraPagina) {
-        alert("Adicione pelo menos uma imagem.");
         return;
       }
 
-      pdf.save("relatorio-fotografico.pdf");
+      generateBtn.classList.add("loading");
+
+      generateBtn.innerHTML =
+        `<div class="loader"></div>`;
+
+
+      setTimeout(() => {
+
+        const { jsPDF } = window.jspdf;
+
+        const pdf = new jsPDF({
+          orientation: "portrait",
+          unit: "mm",
+          format: "a4"
+        });
+
+        let primeiraPagina = true;
+
+        for (let i = 0; i < categorias.length; i++) {
+
+          const imagem = imagens[i];
+
+          if (!imagem) continue;
+
+          if (!primeiraPagina) {
+            pdf.addPage();
+          }
+
+          primeiraPagina = false;
+
+          // FUNDO
+
+          pdf.setFillColor(11, 15, 25);
+
+          pdf.rect(
+            0,
+            0,
+            210,
+            297,
+            "F"
+          );
+
+          // TÍTULO
+
+          pdf.setTextColor(255,255,255);
+
+          pdf.setFontSize(22);
+
+          pdf.text(
+            categorias[i],
+            105,
+            20,
+            {
+              align: "center"
+            }
+          );
+
+          // IMAGEM
+
+          const imgProps =
+            pdf.getImageProperties(imagem);
+
+          const pdfWidth = 180;
+
+          const pdfHeight =
+            (imgProps.height * pdfWidth)
+            / imgProps.width;
+
+          pdf.addImage(
+            imagem,
+            "JPEG",
+            15,
+            35,
+            pdfWidth,
+            pdfHeight
+          );
+
+        }
+
+        pdf.save(
+          "relatorio-fotografico.pdf"
+        );
+
+        generateBtn.classList.remove("loading");
+
+        generateBtn.innerHTML =
+          "Gerar PDF";
+
+      }, 800);
 
     }
 
   </script>
 
 </body>
+
 </html>
