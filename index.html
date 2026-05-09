@@ -1,12 +1,169 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
+
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
   <title>Gerador de PDF</title>
 
-  <link rel="stylesheet" href="style.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
+  <style>
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: Arial, sans-serif;
+    }
+
+    body {
+      background: #0f1117;
+      color: white;
+      min-height: 100vh;
+      padding: 30px;
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: auto;
+    }
+
+    header {
+      text-align: center;
+      margin-bottom: 40px;
+    }
+
+    header h1 {
+      font-size: 42px;
+      margin-bottom: 10px;
+      color: #ffffff;
+    }
+
+    header p {
+      color: #9ca3af;
+      font-size: 16px;
+    }
+
+    .upload-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 20px;
+    }
+
+    .upload-card {
+      background: #1a1d29;
+      border: 1px solid #2b3142;
+      border-radius: 20px;
+      padding: 20px;
+      transition: 0.3s;
+      box-shadow: 0 0 20px rgba(0,0,0,0.25);
+    }
+
+    .upload-card:hover {
+      transform: translateY(-5px);
+      border-color: #5b8cff;
+      box-shadow: 0 0 25px rgba(91, 140, 255, 0.2);
+    }
+
+    .upload-title {
+      margin-bottom: 15px;
+      font-size: 18px;
+      font-weight: bold;
+      color: #ffffff;
+    }
+
+    .upload-label {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+
+      width: 100%;
+      height: 180px;
+
+      border: 2px dashed #3a4257;
+      border-radius: 16px;
+
+      cursor: pointer;
+      overflow: hidden;
+
+      transition: 0.3s;
+
+      background: #12151f;
+    }
+
+    .upload-label:hover {
+      border-color: #5b8cff;
+      background: #151a27;
+    }
+
+    .upload-label span {
+      color: #9ca3af;
+      text-align: center;
+      padding: 10px;
+    }
+
+    .upload-label img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    input[type="file"] {
+      display: none;
+    }
+
+    #generateBtn {
+      margin-top: 40px;
+      width: 100%;
+      padding: 18px;
+
+      border: none;
+      border-radius: 18px;
+
+      background: linear-gradient(135deg, #5b8cff, #7c5cff);
+
+      color: white;
+
+      font-size: 18px;
+      font-weight: bold;
+
+      cursor: pointer;
+
+      transition: 0.3s;
+    }
+
+    #generateBtn:hover {
+      transform: scale(1.01);
+      opacity: 0.95;
+      box-shadow: 0 0 25px rgba(91, 140, 255, 0.35);
+    }
+
+    .footer {
+      text-align: center;
+      margin-top: 30px;
+      color: #6b7280;
+      font-size: 14px;
+    }
+
+    @media (max-width: 700px) {
+
+      body {
+        padding: 20px;
+      }
+
+      header h1 {
+        font-size: 32px;
+      }
+
+      .upload-label {
+        height: 160px;
+      }
+
+    }
+
+  </style>
 </head>
 
 <body>
@@ -15,7 +172,9 @@
 
     <header>
       <h1>Gerador de PDF</h1>
-      <p>Organize e gere relatórios fotográficos automaticamente.</p>
+      <p>
+        Organize imagens e gere relatórios fotográficos automaticamente.
+      </p>
     </header>
 
     <div id="uploadGrid" class="upload-grid"></div>
@@ -24,11 +183,158 @@
       Gerar PDF
     </button>
 
-  </div>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
- 
+    <div class="footer">
+      Sistema de Relatório Fotográfico
+    </div>
 
-  <script src="script.js"></script>
+  </div>
+
+  <script>
+
+    const categorias = [
+      "Estrutura",
+      "Placas",
+      "String Box CA Aberta",
+      "String Box CC Aberta",
+      "Inversor",
+      "Aterramento",
+      "Placa no Poste"
+    ];
+
+    const uploadGrid = document.getElementById("uploadGrid");
+
+    const imagens = [];
+
+    categorias.forEach((categoria, index) => {
+
+      const card = document.createElement("div");
+      card.classList.add("upload-card");
+
+      card.innerHTML = `
+        <div class="upload-title">
+          ${index + 1}. ${categoria}
+        </div>
+
+        <label class="upload-label" for="file-${index}">
+          <span>Selecionar Foto</span>
+        </label>
+
+        <input
+          type="file"
+          id="file-${index}"
+          accept="image/*"
+        >
+      `;
+
+      uploadGrid.appendChild(card);
+
+      const input = card.querySelector("input");
+      const label = card.querySelector(".upload-label");
+
+      input.addEventListener("change", (event) => {
+
+        const file = event.target.files[0];
+
+        if (file) {
+
+          const reader = new FileReader();
+
+          reader.onload = function (e) {
+
+            imagens[index] = e.target.result;
+
+            label.innerHTML = `
+              <img src="${e.target.result}">
+            `;
+
+          };
+
+          reader.readAsDataURL(file);
+
+        }
+
+      });
+
+    });
+
+
+    // ==========================
+    // GERAR PDF
+    // ==========================
+
+    document
+      .getElementById("generateBtn")
+      .addEventListener("click", gerarPDF);
+
+
+    async function gerarPDF() {
+
+      const { jsPDF } = window.jspdf;
+
+      const pdf = new jsPDF({
+        orientation: "portrait",
+        unit: "mm",
+        format: "a4"
+      });
+
+      let primeiraPagina = true;
+
+      for (let i = 0; i < categorias.length; i++) {
+
+        const imagem = imagens[i];
+
+        if (!imagem) continue;
+
+        if (!primeiraPagina) {
+          pdf.addPage();
+        }
+
+        primeiraPagina = false;
+
+        // Fundo escuro da página
+        pdf.setFillColor(15, 17, 23);
+        pdf.rect(0, 0, 210, 297, "F");
+
+        // Título
+        pdf.setTextColor(255, 255, 255);
+        pdf.setFontSize(22);
+
+        pdf.text(
+          categorias[i],
+          105,
+          20,
+          { align: "center" }
+        );
+
+        // Configuração da imagem
+        const imgProps = pdf.getImageProperties(imagem);
+
+        const pdfWidth = 180;
+
+        const pdfHeight =
+          (imgProps.height * pdfWidth) / imgProps.width;
+
+        pdf.addImage(
+          imagem,
+          "JPEG",
+          15,
+          35,
+          pdfWidth,
+          pdfHeight
+        );
+
+      }
+
+      if (primeiraPagina) {
+        alert("Adicione pelo menos uma imagem.");
+        return;
+      }
+
+      pdf.save("relatorio-fotografico.pdf");
+
+    }
+
+  </script>
 
 </body>
 </html>
