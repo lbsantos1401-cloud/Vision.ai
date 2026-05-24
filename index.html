@@ -1,734 +1,943 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
-
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-
-  <title>Gerador de PDF</title>
-
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-
-  <style>
-
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-      font-family: Arial, sans-serif;
-    }
-
-    body {
-
-      background:
-        radial-gradient(circle at top,
-          rgba(91, 140, 255, 0.15),
-          transparent 30%),
-        #0b0f19;
-
-      color: white;
-
-      min-height: 100vh;
-
-      overflow-x: hidden;
-
-      padding: 20px;
-    }
-
-    .background-glow {
-
-      position: fixed;
-
-      width: 600px;
-      height: 600px;
-
-      background: rgba(91, 140, 255, 0.12);
-
-      filter: blur(120px);
-
-      border-radius: 50%;
-
-      top: -200px;
-      left: -100px;
-
-      z-index: -1;
-
-      animation: floatGlow 10s ease-in-out infinite;
-    }
-
-    @keyframes floatGlow {
-
-      0% {
-        transform: translateY(0px) translateX(0px);
-      }
-
-      50% {
-        transform: translateY(40px) translateX(30px);
-      }
-
-      100% {
-        transform: translateY(0px) translateX(0px);
-      }
-
-    }
-
-    .container {
-      max-width: 1250px;
-      margin: auto;
-    }
-
-    header {
-      text-align: center;
-      margin-bottom: 50px;
-      animation: fadeIn 1s ease;
-    }
-
-    .logo {
-
-      width: 90px;
-      height: 90px;
-
-      margin: auto;
-      margin-bottom: 20px;
-
-      border-radius: 30px;
-
-      background:
-        linear-gradient(135deg,
-          #5b8cff,
-          #7c5cff);
-
-      display: flex;
-      align-items: center;
-      justify-content: center;
-
-      font-size: 40px;
-
-      box-shadow:
-        0 0 40px rgba(91, 140, 255, 0.45);
-
-      animation: pulse 4s infinite;
-    }
-
-    @keyframes pulse {
-
-      0% {
-        box-shadow: 0 0 30px rgba(91, 140, 255, 0.35);
-      }
-
-      50% {
-        box-shadow: 0 0 55px rgba(91, 140, 255, 0.6);
-      }
-
-      100% {
-        box-shadow: 0 0 30px rgba(91, 140, 255, 0.35);
-      }
-
-    }
-
-    header h1 {
-      font-size: 46px;
-      margin-bottom: 12px;
-      font-weight: bold;
-    }
-
-    header p {
-      color: #9ca3af;
-      font-size: 17px;
-    }
-
-    .upload-grid {
-
-      display: grid;
-
-      grid-template-columns:
-        repeat(auto-fit, minmax(260px, 1fr));
-
-      gap: 22px;
-    }
-
-    .upload-card {
-
-      background: rgba(26, 29, 41, 0.8);
-
-      backdrop-filter: blur(12px);
-
-      border: 1px solid rgba(255,255,255,0.05);
-
-      border-radius: 24px;
-
-      padding: 20px;
-
-      transition: 0.35s ease;
-
-      animation: fadeUp 0.6s ease;
-    }
-
-    .upload-card:hover {
-
-      transform:
-        translateY(-6px)
-        scale(1.01);
-
-      border-color: rgba(91, 140, 255, 0.5);
-
-      box-shadow:
-        0 0 35px rgba(91, 140, 255, 0.2);
-    }
-
-    .upload-title {
-
-      font-size: 18px;
-      font-weight: bold;
-
-      margin-bottom: 15px;
-    }
-
-    .upload-label {
-
-      width: 100%;
-      height: 200px;
-
-      border-radius: 20px;
-
-      border: 2px dashed #3a4257;
-
-      display: flex;
-      align-items: center;
-      justify-content: center;
-
-      cursor: pointer;
-
-      overflow: hidden;
-
-      position: relative;
-
-      transition: 0.3s;
-
-      background: rgba(255,255,255,0.02);
-    }
-
-    .upload-label:hover {
-
-      border-color: #5b8cff;
-
-      background: rgba(91,140,255,0.08);
-    }
-
-    .upload-label.dragover {
-
-      border-color: #7aa2ff;
-
-      background: rgba(91,140,255,0.15);
-
-      transform: scale(1.02);
-    }
-
-    .upload-label span {
-
-      color: #9ca3af;
-
-      text-align: center;
-
-      padding: 20px;
-
-      font-size: 15px;
-    }
-
-    .upload-label img {
-
-      width: 100%;
-      height: 100%;
-
-      object-fit: cover;
-
-      transition: 0.4s;
-    }
-
-    .upload-label img:hover {
-      transform: scale(1.04);
-    }
-
-    input[type="file"] {
-      display: none;
-    }
-
-    #generateBtn {
-
-      margin-top: 45px;
-
-      width: 100%;
-
-      padding: 20px;
-
-      border: none;
-
-      border-radius: 22px;
-
-      background:
-        linear-gradient(135deg,
-          #5b8cff,
-          #7c5cff);
-
-      color: white;
-
-      font-size: 18px;
-      font-weight: bold;
-
-      cursor: pointer;
-
-      transition: 0.35s;
-
-      position: relative;
-
-      overflow: hidden;
-    }
-
-    #generateBtn:hover {
-
-      transform: translateY(-3px);
-
-      box-shadow:
-        0 0 35px rgba(91,140,255,0.35);
-    }
-
-    #generateBtn.loading {
-
-      pointer-events: none;
-
-      opacity: 0.8;
-    }
-
-    .loader {
-
-      width: 22px;
-      height: 22px;
-
-      border: 3px solid rgba(255,255,255,0.3);
-
-      border-top: 3px solid white;
-
-      border-radius: 50%;
-
-      animation: spin 1s linear infinite;
-
-      margin: auto;
-    }
-
-    @keyframes spin {
-
-      from {
-        transform: rotate(0deg);
-      }
-
-      to {
-        transform: rotate(360deg);
-      }
-
-    }
-
-    @keyframes fadeIn {
-
-      from {
-        opacity: 0;
-        transform: translateY(-10px);
-      }
-
-      to {
-        opacity: 1;
-        transform: translateY(0);
-      }
-
-    }
-
-    @keyframes fadeUp {
-
-      from {
-        opacity: 0;
-        transform: translateY(25px);
-      }
-
-      to {
-        opacity: 1;
-        transform: translateY(0);
-      }
-
-    }
-
-    .footer {
-
-      text-align: center;
-
-      margin-top: 30px;
-
-      color: #6b7280;
-
-      font-size: 14px;
-    }
-
-    @media (max-width: 768px) {
-
-      body {
-        padding: 16px;
-      }
-
-      header h1 {
-        font-size: 34px;
-      }
-
-      header p {
-        font-size: 15px;
-      }
-
-      .upload-grid {
-        gap: 16px;
-      }
-
-      .upload-label {
-        height: 170px;
-      }
-
-      #generateBtn {
-        padding: 18px;
-      }
-
-    }
-
-  </style>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
+
+<title>Voxel FPS Prototype</title>
+
+<style>
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+    touch-action:none;
+}
+
+body{
+    overflow:hidden;
+    background:#000;
+    font-family:Arial, sans-serif;
+
+    touch-action:none;
+    overscroll-behavior:none;
+}
+
+/* HUD */
+
+#crosshair{
+    position:fixed;
+    left:50%;
+    top:50%;
+    transform:translate(-50%,-50%);
+    color:white;
+    font-size:42px;
+    pointer-events:none;
+    text-shadow:0 0 10px #000;
+}
+
+#hud{
+    position:fixed;
+    top:15px;
+    left:15px;
+    color:white;
+    background:rgba(0,0,0,0.5);
+    padding:10px 14px;
+    border-radius:10px;
+    font-size:18px;
+    z-index:10;
+}
+
+/* Joystick */
+
+#joystick-base{
+    position:fixed;
+    left:25px;
+    bottom:25px;
+    width:120px;
+    height:120px;
+    border-radius:50%;
+    background:rgba(255,255,255,0.15);
+    border:2px solid rgba(255,255,255,0.3);
+    z-index:20;
+}
+
+#joystick-stick{
+    position:absolute;
+    left:35px;
+    top:35px;
+    width:50px;
+    height:50px;
+    border-radius:50%;
+    background:rgba(255,255,255,0.4);
+}
+
+/* Shoot */
+
+#shootBtn{
+    position:fixed;
+    right:30px;
+    bottom:40px;
+    width:110px;
+    height:110px;
+    border:none;
+    border-radius:50%;
+    background:rgba(255,120,120,0.75);
+    color:white;
+    font-size:24px;
+    font-weight:bold;
+    z-index:20;
+}
+
+#shootBtn:active{
+    transform:scale(0.95);
+}
+
+/* Aim Area */
+
+#lookArea{
+    position:fixed;
+    right:0;
+    top:0;
+    width:50%;
+    height:100%;
+    z-index:5;
+}
+</style>
 </head>
-
 <body>
 
-  <div class="background-glow"></div>
+<div id="hud">VOXEL FPS PROTOTYPE</div>
 
-  <div class="container">
+<div id="crosshair">+</div>
 
-    <header>
+<div id="joystick-base">
+    <div id="joystick-stick"></div>
+</div>
 
-      <div class="logo">
-        📄
-      </div>
+<button id="shootBtn">SHOOT</button>
 
-      <h1>Gerador de PDF</h1>
+<div id="lookArea"></div>
 
-      <p>
-        Sistema inteligente para relatórios fotográficos
-      </p>
+<script type="module">
 
-    </header>
+import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.160/build/three.module.js';
 
-    <div id="uploadGrid" class="upload-grid"></div>
+/* =========================
+   SETUP
+========================= */
 
-    <button id="generateBtn">
-      Gerar PDF
-    </button>
+const scene = new THREE.Scene();
+scene.background = new THREE.Color(0x87CEEB);
 
-    <div class="footer">
-      Powered by AI Workflow
-    </div>
+const camera = new THREE.PerspectiveCamera(
+    75,
+    window.innerWidth / window.innerHeight,
+    0.1,
+    1000
+);
 
-  </div>
+const renderer = new THREE.WebGLRenderer({
+    antialias:false
+});
 
-  <script>
+renderer.setSize(window.innerWidth, window.innerHeight);
 
-    const categorias = [
-      "Estrutura",
-      "Placas",
-      "String Box CA Aberta",
-      "String Box CC Aberta",
-      "Inversor",
-      "Aterramento",
-      "Placa no Poste"
-    ];
+renderer.setPixelRatio(window.devicePixelRatio);
 
-    const imagens = [];
+renderer.shadowMap.enabled = true;
+document.body.appendChild(renderer.domElement);
 
-    const uploadGrid =
-      document.getElementById("uploadGrid");
+/* =========================
+   LIGHT
+========================= */
 
+const ambient = new THREE.AmbientLight(0xffffff, 0.7);
+scene.add(ambient);
 
-    categorias.forEach((categoria, index) => {
+const sun = new THREE.DirectionalLight(0xffffff, 1.2);
+sun.position.set(20, 30, 10);
+scene.add(sun);
 
-      const card =
-        document.createElement("div");
+/* =========================
+   PLAYER
+========================= */
 
-      card.classList.add("upload-card");
+const player = {
+    x:0,
+    y:2,
+    z:5,
 
-      card.innerHTML = `
-      
-        <div class="upload-title">
-          ${index + 1}. ${categoria}
-        </div>
+    // velocidade maior
+    speed:0.16,
 
-        <label class="upload-label" for="file-${index}">
-          <span>
-            Clique ou arraste uma imagem
-          </span>
-        </label>
+    rotY:0,
+    rotX:0
+};
 
-        <input
-          type="file"
-          id="file-${index}"
-          accept="image/*"
-        >
-      
-      `;
+camera.position.set(player.x, player.y, player.z);
 
-      uploadGrid.appendChild(card);
+/* =========================
+   WORLD
+========================= */
+const collidableMeshes = [];
 
-      const input =
-        card.querySelector("input");
+const particles = [];
 
-      const label =
-        card.querySelector(".upload-label");
 
+/* =========================
+   PARTICLES
+========================= */
 
-      // CLICK NORMAL
 
-      input.addEventListener(
-        "change",
-        (event) => {
+function createImpactParticles(position, color){
 
-          const file =
-            event.target.files[0];
+    for(let i = 0; i < 6; i++){
 
-          if (file) {
-            processarImagem(file, index, label);
-          }
+        const particle = new THREE.Mesh(
 
-        }
-      );
+            new THREE.BoxGeometry(
+                0.08,
+                0.08,
+                0.08
+            ),
 
+            new THREE.MeshLambertMaterial({
+                color: color
+            })
+        );
 
-      // DRAG AND DROP
+        particle.position.copy(position);
 
-      label.addEventListener(
-        "dragover",
-        (e) => {
+particle.position.x +=
+    (Math.random() - 0.5) * 0.05;
 
-          e.preventDefault();
+particle.position.y +=
+    (Math.random() - 0.5) * 0.05;
 
-          label.classList.add("dragover");
+particle.position.z +=
+    (Math.random() - 0.5) * 0.05;
 
-        }
-      );
+        // velocidade aleatória
+        particle.userData.velocity = {
 
-      label.addEventListener(
-        "dragleave",
-        () => {
-
-          label.classList.remove("dragover");
-
-        }
-      );
-
-      label.addEventListener(
-        "drop",
-        (e) => {
-
-          e.preventDefault();
-
-          label.classList.remove("dragover");
-
-          const file =
-            e.dataTransfer.files[0];
-
-          if (file) {
-            processarImagem(file, index, label);
-          }
-
-        }
-      );
-
-    });
-
-
-    // ==========================
-    // COMPRESSÃO AUTOMÁTICA
-    // ==========================
-
-    function processarImagem(file, index, label) {
-
-      const reader = new FileReader();
-
-      reader.onload = function(event) {
-
-        const img = new Image();
-
-        img.src = event.target.result;
-
-        img.onload = function() {
-
-          const canvas =
-            document.createElement("canvas");
-
-          const ctx =
-            canvas.getContext("2d");
-
-          const maxWidth = 1400;
-
-          let width = img.width;
-          let height = img.height;
-
-          if (width > maxWidth) {
-
-            height *= maxWidth / width;
-
-            width = maxWidth;
-          }
-
-          canvas.width = width;
-          canvas.height = height;
-
-          ctx.drawImage(
-            img,
-            0,
-            0,
-            width,
-            height
-          );
-
-          const compressed =
-            canvas.toDataURL(
-              "image/jpeg",
-              0.75
-            );
-
-          imagens[index] = compressed;
-
-          label.innerHTML = `
-            <img src="${compressed}">
-          `;
-
+            x:(Math.random() - 0.5) * 0.12,
+            y:Math.random() * 0.12,
+            z:(Math.random() - 0.5) * 0.12
         };
 
-      };
+        particle.userData.life = 40;
 
-      reader.readAsDataURL(file);
+        scene.add(particle);
 
+        particles.push(particle);
     }
+}
+
+function createBlock(x,y,z,w,h,d,color){
+
+    const geo = new THREE.BoxGeometry(w,h,d);
+
+    const mat = new THREE.MeshLambertMaterial({
+        color
+    });
+
+    const mesh = new THREE.Mesh(geo, mat);
+
+    mesh.position.set(x,y,z);
+
+ scene.add(mesh);
 
 
-    // ==========================
-    // GERAR PDF
-    // ==========================
+// adiciona na lista de colisão
+collidableMeshes.push(mesh);
 
-    const generateBtn =
-      document.getElementById("generateBtn");
+return mesh;
+}
 
-    generateBtn.addEventListener(
-      "click",
-      gerarPDF
-    );
+/* =========================
+   CITY GROUND
+========================= */
 
+for(let x = -40; x < 40; x++){
 
-    async function gerarPDF() {
+    for(let z = -40; z < 40; z++){
 
-      if (
-        imagens.filter(Boolean).length === 0
-      ) {
+        let color = 0x2f2f2f;
 
-        alert(
-          "Adicione pelo menos uma imagem."
-        );
+        // rua principal
+        if(
+            x > -4 &&
+            x < 4
+        ){
 
-        return;
-      }
-
-      generateBtn.classList.add("loading");
-
-      generateBtn.innerHTML =
-        `<div class="loader"></div>`;
-
-
-      setTimeout(() => {
-
-        const { jsPDF } = window.jspdf;
-
-        const pdf = new jsPDF({
-          orientation: "portrait",
-          unit: "mm",
-          format: "a4"
-        });
-
-        let primeiraPagina = true;
-
-        for (let i = 0; i < categorias.length; i++) {
-
-          const imagem = imagens[i];
-
-          if (!imagem) continue;
-
-          if (!primeiraPagina) {
-            pdf.addPage();
-          }
-
-          primeiraPagina = false;
-
-          // FUNDO
-
-          pdf.setFillColor(11, 15, 25);
-
-          pdf.rect(
-            0,
-            0,
-            210,
-            297,
-            "F"
-          );
-
-          // TÍTULO
-
-          pdf.setTextColor(255,255,255);
-
-          pdf.setFontSize(22);
-
-          pdf.text(
-            categorias[i],
-            105,
-            20,
-            {
-              align: "center"
-            }
-          );
-
-          // IMAGEM
-
-          const imgProps =
-            pdf.getImageProperties(imagem);
-
-          const pdfWidth = 180;
-
-          const pdfHeight =
-            (imgProps.height * pdfWidth)
-            / imgProps.width;
-
-          pdf.addImage(
-            imagem,
-            "JPEG",
-            15,
-            35,
-            pdfWidth,
-            pdfHeight
-          );
-
+            color = 0x2a2a2a;
         }
 
-        pdf.save(
-          "relatorio-fotografico.pdf"
+        // calçadas
+        else if(
+            x >= -6 &&
+            x <= 6
+        ){
+
+            color = 0x555555;
+        }
+
+        // vegetação lateral
+        else{
+
+            color =
+                Math.random() > 0.5
+                ? 0x355e3b
+                : 0x2f4f34;
+        }
+
+        createBlock(
+            x,
+            0,
+            z,
+            1,
+            1,
+            1,
+            color
         );
+    }
+}
 
-        generateBtn.classList.remove("loading");
+/* Trees */
 
-        generateBtn.innerHTML =
-          "Gerar PDF";
+/* =========================
+   BUILDINGS
+========================= */
 
-      }, 800);
+function createBuilding(x, z, width, height, depth){
 
+    // corpo principal
+    createBlock(
+        x,
+        height / 2,
+        z,
+        width,
+        height,
+        depth,
+        0x4a4a4a
+    );
+
+    // janelas voxel
+    for(let y = 2; y < height - 2; y += 2){
+
+        for(let side = -1; side <= 1; side += 2){
+
+            for(let offset = -width/2 + 1; offset < width/2; offset += 2){
+
+                createBlock(
+                    x + offset,
+                    y,
+                    z + (depth/2 * side),
+                    0.6,
+                    0.6,
+                    0.2,
+                    0x89cff0
+                );
+            }
+        }
     }
 
-  </script>
+    // vegetação subindo no prédio
+    for(let ivy = 2; ivy < height; ivy += 2){
 
+        if(Math.random() > 0.4){
+
+            createBlock(
+                x - width/2,
+                ivy,
+                z + depth/2,
+                0.3,
+                1.2,
+                0.3,
+                0x2f7d32
+            );
+        }
+    }
+}
+
+function createTree(x,z){
+
+    for(let i=1;i<5;i++){
+        createBlock(x, i, z, 1,1,1, 0x6B4423);
+    }
+
+    for(let lx=-1; lx<=1; lx++){
+        for(let lz=-1; lz<=1; lz++){
+            for(let ly=4; ly<=5; ly++){
+
+                createBlock(
+                    x+lx,
+                    ly,
+                    z+lz,
+                    1,
+                    1,
+                    1,
+                    0x1E9C2F
+                );
+            }
+        }
+    }
+}
+
+/* =========================
+   CITY BUILDINGS
+========================= */
+for(let z = -60; z < 60; z += 14){
+
+    // prédios lado esquerdo
+    createBuilding(
+        -22,
+        z,
+        10,
+        20 + Math.random() * 18,
+        10
+    );
+
+    createBuilding(
+        -36,
+        z + 4,
+        12,
+        26 + Math.random() * 22,
+        12
+    );
+
+    // prédios lado direito
+    createBuilding(
+        22,
+        z,
+        10,
+        20 + Math.random() * 18,
+        10
+    );
+
+    createBuilding(
+        36,
+        z - 4,
+        12,
+        26 + Math.random() * 22,
+        12
+    );
+}
+/* =========================
+   ABANDONED CARS
+========================= */
+
+function createCar(x, z, color){
+
+    // corpo
+    createBlock(
+        x,
+        1,
+        z,
+        2.8,
+        1,
+        5,
+        color
+    );
+
+    // teto
+    createBlock(
+        x,
+        1.8,
+        z,
+        2,
+        0.8,
+        2.5,
+        0x222222
+    );
+
+    // capô
+    createBlock(
+        x,
+        1.4,
+        z - 1.5,
+        2,
+        0.5,
+        1.2,
+        color
+    );
+
+    // rodas
+    createBlock(
+        x - 1.2,
+        0.5,
+        z - 1.5,
+        0.5,
+        0.5,
+        0.5,
+        0x111111
+    );
+
+    createBlock(
+        x + 1.2,
+        0.5,
+        z - 1.5,
+        0.5,
+        0.5,
+        0.5,
+        0x111111
+    );
+
+    createBlock(
+        x - 1.2,
+        0.5,
+        z + 1.5,
+        0.5,
+        0.5,
+        0.5,
+        0x111111
+    );
+
+    createBlock(
+        x + 1.2,
+        0.5,
+        z + 1.5,
+        0.5,
+        0.5,
+        0.5,
+        0x111111
+    );
+}
+/* =========================
+   CAR SPAWNS
+========================= */
+
+for(let i = -50; i < 50; i += 12){
+
+    // lado esquerdo da rua
+    createCar(
+        -2 + Math.random() * 1.5,
+        i,
+        0x4a4a4a
+    );
+
+    // lado direito da rua
+    createCar(
+        2 - Math.random() * 1.5,
+        i + 6,
+        0x5a3a3a
+    );
+}
+/* =========================
+   WEAPON
+========================= */
+
+const gunGroup = new THREE.Group();
+
+const gunBody = new THREE.Mesh(
+    new THREE.BoxGeometry(0.35,0.25,1),
+    new THREE.MeshLambertMaterial({
+        color:0x333333
+    })
+);
+
+gunBody.position.set(0.45,-0.45,-1);
+
+// posição original da arma
+const gunBaseX = 0.45;
+const gunBaseY = -0.45;
+const gunBaseZ = -1;
+
+gunGroup.add(gunBody);
+
+camera.add(gunGroup);
+
+scene.add(camera);
+
+/* =========================
+   RAYCAST
+========================= */
+
+const raycaster = new THREE.Raycaster();
+
+const screenCenter = new THREE.Vector2(0,0);
+// muzzle flash light
+
+const muzzleFlash = new THREE.PointLight(
+    0xffaa55,
+    0,
+    12
+);
+
+muzzleFlash.position.set(
+    0.45,
+    -0.42,
+    -1.05
+);
+
+camera.add(muzzleFlash);
+
+/* =========================
+   MOBILE JOYSTICK
+========================= */
+
+const joystickBase = document.getElementById("joystick-base");
+const joystickStick = document.getElementById("joystick-stick");
+
+let moveX = 0;
+let moveZ = 0;
+
+// suavização
+let smoothMoveX = 0;
+let smoothMoveZ = 0;
+// head bobbing
+let bobTime = 0;
+// sway da arma
+let swayX = 0;
+let swayY = 0;
+// recoil
+let recoil = 0;
+let recoilRecover = 0;
+
+
+let dragging = false;
+
+// touch do joystick
+let joystickTouchId = null;
+
+joystickBase.addEventListener("touchstart", (e)=>{
+
+    const touch = e.changedTouches[0];
+
+    joystickTouchId = touch.identifier;
+
+    dragging = true;
+
+});
+
+window.addEventListener("touchend",(e)=>{
+
+    for(let touch of e.changedTouches){
+
+        if(touch.identifier === joystickTouchId){
+
+            dragging = false;
+
+            joystickTouchId = null;
+
+            moveX = 0;
+            moveZ = 0;
+
+            joystickStick.style.left = "35px";
+            joystickStick.style.top = "35px";
+        }
+    }
+});
+
+window.addEventListener("touchmove",(e)=>{
+
+    if(!dragging) return;
+
+let touch = null;
+
+for(let t of e.touches){
+
+    if(t.identifier === joystickTouchId){
+        touch = t;
+        break;
+    }
+}
+
+if(!touch) return;
+
+    const rect = joystickBase.getBoundingClientRect();
+
+    const centerX = rect.left + rect.width/2;
+    const centerY = rect.top + rect.height/2;
+
+    let dx = touch.clientX - centerX;
+    let dy = touch.clientY - centerY;
+
+    const distance = Math.sqrt(dx*dx + dy*dy);
+
+    const max = 35;
+
+    if(distance > max){
+
+        dx = dx / distance * max;
+        dy = dy / distance * max;
+    }
+
+    joystickStick.style.left = (dx + 35) + "px";
+    joystickStick.style.top = (dy + 35) + "px";
+
+    moveX = dx / max;
+    moveZ = dy / max;
+
+});
+
+/* =========================
+   LOOK CONTROLS
+========================= */
+
+const lookArea = document.getElementById("lookArea");
+
+let lastX = 0;
+let lastY = 0;
+let looking = false;
+
+// touch da câmera
+let lookTouchId = null;
+
+lookArea.addEventListener("touchstart",(e)=>{
+
+    const touch = e.changedTouches[0];
+
+    lookTouchId = touch.identifier;
+
+    looking = true;
+
+    lastX = touch.clientX;
+    lastY = touch.clientY;
+
+});
+
+lookArea.addEventListener("touchmove",(e)=>{
+
+    if(!looking) return;
+
+ let touch = null;
+
+for(let t of e.touches){
+
+    if(t.identifier === lookTouchId){
+        touch = t;
+        break;
+    }
+}
+
+if(!touch) return;
+
+    const dx = touch.clientX - lastX;
+    const dy = touch.clientY - lastY;
+
+// sensibilidade maior
+player.rotY -= dx * 0.006;
+player.rotX -= dy * 0.006;
+
+    player.rotX = Math.max(
+        -1.2,
+        Math.min(1.2, player.rotX)
+    );
+
+    lastX = touch.clientX;
+    lastY = touch.clientY;
+
+});
+
+window.addEventListener("touchend",(e)=>{
+
+    for(let touch of e.changedTouches){
+
+        if(touch.identifier === lookTouchId){
+
+            looking = false;
+
+            lookTouchId = null;
+        }
+    }
+});
+
+/* =========================
+   SHOOT
+========================= */
+
+const shootBtn = document.getElementById("shootBtn");
+
+shootBtn.addEventListener("click",()=>{
+
+    // recuo da arma
+    recoil = 0.12;
+// dispara raycast
+raycaster.setFromCamera(
+    screenCenter,
+    camera
+);
+
+const hits = raycaster.intersectObjects(
+    collidableMeshes
+);
+
+if(hits.length > 0){
+
+const hit = hits[0];
+
+createImpactParticles(
+    hit.point,
+    hit.object.material.color.getHex()
+);
+
+
+console.log("HIT!");
+}
+    // recuo da câmera
+    player.rotX -= 0.025;
+
+    // muzzle flash
+    muzzleFlash.intensity = 5;
+});
+
+/* =========================
+   ANIMATION LOOP
+========================= */
+
+function animate(){
+
+    requestAnimationFrame(animate);
+
+    /* movement */
+
+    const forwardX = Math.sin(player.rotY);
+    const forwardZ = Math.cos(player.rotY);
+
+    const rightX = Math.cos(player.rotY);
+    const rightZ = -Math.sin(player.rotY);
+
+// intensidade do movimento
+const movementAmount =
+    Math.abs(smoothMoveX) +
+    Math.abs(smoothMoveZ);
+
+// suavização do movimento
+smoothMoveX += (moveX - smoothMoveX) * 0.12;
+smoothMoveZ += (moveZ - smoothMoveZ) * 0.12;
+
+player.x += (
+    forwardX * smoothMoveZ +
+    rightX * smoothMoveX
+) * player.speed;
+
+player.z += (
+    forwardZ * smoothMoveZ +
+    rightZ * smoothMoveX
+) * player.speed;
+
+// head bobbing melhorado
+
+let bobOffset = 0;
+
+if(movementAmount > 0.05){
+
+    bobTime += 0.08;
+
+    bobOffset =
+        Math.sin(bobTime * 10) * 0.018;
+
+}else{
+
+    bobTime = 0;
+}
+
+// posição da câmera
+camera.position.x = player.x;
+
+camera.position.y =
+    player.y + bobOffset;
+
+camera.position.z = player.z;
+
+    camera.rotation.order = "YXZ";
+
+    camera.rotation.y = player.rotY;
+    camera.rotation.x = player.rotX;
+
+// weapon sway suave
+
+swayX += (
+    (-moveX * 0.008) - swayX
+) * 0.03;
+
+swayY += (
+    (-movementAmount * 0.004) - swayY
+) * 0.03;
+
+// posição suave da arma
+gunBody.position.x =
+    gunBaseX + swayX;
+
+gunBody.position.y =
+    gunBaseY +
+    swayY +
+    (bobOffset * 0.12);
+// suavização do recoil
+recoilRecover += (recoil - recoilRecover) * 0.18;
+
+recoil *= 0.82;
+
+if(recoil < 0.001){
+    recoil = 0;
+}
+
+// fade do muzzle flash
+muzzleFlash.intensity *= 0.55;
+
+// posição final da arma
+gunBody.position.z =
+    gunBaseZ + recoilRecover;
+  /* =========================
+   UPDATE PARTICLES
+========================= */
+
+for(let i = particles.length - 1; i >= 0; i--){
+
+    const particle = particles[i];
+
+    // movimento
+    particle.position.x +=
+        particle.userData.velocity.x;
+
+    particle.position.y +=
+        particle.userData.velocity.y;
+
+    particle.position.z +=
+        particle.userData.velocity.z;
+
+    // gravidade
+    particle.userData.velocity.y -= 0.005;
+  // atrito
+    particle.userData.velocity.x *= 0.96;
+    particle.userData.velocity.z *= 0.96;
+    // vida
+    particle.userData.life--;
+
+    // remove
+    if(particle.userData.life <= 0){
+
+        scene.remove(particle);
+
+        particles.splice(i,1);
+    }
+}
+
+    renderer.render(scene,camera);
+    
+}
+
+animate();
+
+/* =========================
+   RESIZE
+========================= */
+
+window.addEventListener("resize",()=>{
+
+    camera.aspect = window.innerWidth / window.innerHeight;
+
+    camera.updateProjectionMatrix();
+
+    renderer.setSize(
+        window.innerWidth,
+        window.innerHeight
+    );
+
+});
+
+</script>
 </body>
-
 </html>
