@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>OESIX.IH</title>
+
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+<!-- DEBUG PANEL -->
+
+<button id="debugButton">
+    Debug
+</button>
+
+
+<div id="debugPanel" class="hidden">
+
+
+    <button id="closeDebug">
+        X
+    </button>
+
+
+    <h3>
+        OESIX Debug
+    </h3>
+
+
+<div id="debugContent">
+Aguardando dados...
+</div>
+
+
+</div>
+
+
+
+    <div id="app">
+
+        <header>
+            <h1>OESIX.IH</h1>
+            <p>Agente Cognitivo Modular</p>
+        </header>
+
+        <main id="chat"></main>
+
+        <footer>
+
+            <input
+                type="text"
+                id="messageInput"
+                placeholder="Digite uma mensagem..."
+                autocomplete="off">
+
+            <button id="sendButton">
+                Enviar
+            </button>
+
+        </footer>
+
+    </div>
+
+    <script type="module" src="app.js"></script>
+
+</body>
+
+</html>
